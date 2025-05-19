@@ -25,23 +25,30 @@ export function AuditHistory({ events }: AuditHistoryProps) {
         {events.map((event, index) => (
           <div
             key={index}
-            className="flex items-center justify-between p-2 bg-gray-50 rounded"
+            className="flex flex-col p-2 bg-gray-50 rounded"
           >
-            <div className="flex items-center space-x-4">
-              <span className={`px-2 py-1 rounded text-sm ${
-                event.type === 'start' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-              }`}>
-                {event.type.toUpperCase()}
-              </span>
-              <span className="font-medium">{event.timerId}</span>
-              <span className="text-gray-500">({event.side})</span>
-              <span className="font-mono text-sm">
-                {formatElapsedTime(event.elapsedTime)}
+            <div className="flex items-center justify-between mb-1">
+              <div className="flex items-center space-x-4">
+                <span className={`px-2 py-1 rounded text-sm ${
+                  event.type === 'start' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                }`}>
+                  {event.type.toUpperCase()}
+                </span>
+                <span className="font-medium">{event.timerId}</span>
+                <span className="text-gray-500">({event.side})</span>
+                <span className="font-mono text-sm">
+                  {formatElapsedTime(event.elapsedTime)}
+                </span>
+              </div>
+              <span className="text-sm text-gray-500 font-mono">
+                {formatTimestamp(event.timestamp)}
               </span>
             </div>
-            <span className="text-sm text-gray-500 font-mono">
-              {formatTimestamp(event.timestamp)}
-            </span>
+            <div className="text-sm text-gray-600">
+              {event.roundLabel && <span className="mr-4">Round: {event.roundLabel}</span>}
+              {event.affCode && <span className="mr-4">Aff: {event.affCode}</span>}
+              {event.negCode && <span>Neg: {event.negCode}</span>}
+            </div>
           </div>
         ))}
         {events.length === 0 && (

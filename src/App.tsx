@@ -12,6 +12,9 @@ function App() {
   const [events, setEvents] = useState<TimerEvent[]>([]);
   const [viewMode, setViewMode] = useState<ViewMode>('timers');
   const [resetTrigger, setResetTrigger] = useState(0);
+  const [affCode, setAffCode] = useState('');
+  const [negCode, setNegCode] = useState('');
+  const [roundLabel, setRoundLabel] = useState('');
 
   const handleTimerStart = (timerId: string) => {
     if (currentTimer) {
@@ -30,7 +33,10 @@ function App() {
       type: event.type,
       timerId,
       side: timerId.startsWith('aff') ? 'affirmative' : 'negative',
-      elapsedTime: event.elapsedTime
+      elapsedTime: event.elapsedTime,
+      affCode,
+      negCode,
+      roundLabel
     }]);
   };
 
@@ -88,6 +94,41 @@ function App() {
             >
               Audit
             </button>
+          </div>
+        </div>
+
+        <div className="mb-6 space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Round</label>
+            <input
+              type="text"
+              value={roundLabel}
+              onChange={(e) => setRoundLabel(e.target.value)}
+              placeholder="Round Label (e.g., 'Round 1', 'Finals')"
+              className="w-full p-2 rounded-lg border border-gray-300"
+            />
+          </div>
+          <div className="flex gap-4">
+            <div className="flex-1">
+              <label className="block text-sm font-medium text-gray-700 mb-1">Affirmative</label>
+              <input
+                type="text"
+                value={affCode}
+                onChange={(e) => setAffCode(e.target.value)}
+                placeholder="Team Code"
+                className="w-full p-2 rounded-lg border border-gray-300"
+              />
+            </div>
+            <div className="flex-1">
+              <label className="block text-sm font-medium text-gray-700 mb-1">Negative</label>
+              <input
+                type="text"
+                value={negCode}
+                onChange={(e) => setNegCode(e.target.value)}
+                placeholder="Team Code"
+                className="w-full p-2 rounded-lg border border-gray-300"
+              />
+            </div>
           </div>
         </div>
 

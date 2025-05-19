@@ -4,6 +4,9 @@ export interface TimerEvent {
   timerId: string;
   side: 'affirmative' | 'negative';
   elapsedTime: number;
+  affCode: string;
+  negCode: string;
+  roundLabel: string;
 }
 
 export interface Timer {
