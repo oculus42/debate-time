@@ -7,6 +7,7 @@ export interface TimerEvent {
   affCode: string;
   negCode: string;
   roundLabel: string;
+  sessionId: string;
 }
 
 export interface Timer {
@@ -28,4 +29,19 @@ export interface DebateState {
   events: TimerEvent[];
   startTime: number | null;
   elapsedTime: number;
+}
+
+export interface DebateSession {
+  id: string;
+  round: string;
+  teams: {
+    affirmative: string;
+    negative: string;
+  };
+  timers: {
+    id: string;
+    name: string;
+    currentTime: number;
+  }[];
+  auditLog: TimerEvent[];
 } 

@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { DebateFormat, TimerEvent } from './types/debate';
+import { DebateFormat, TimerEvent, DebateSession } from './types/debate';
 import { defaultFormats } from './data/defaultFormats';
 import { Timer } from './components/Timer';
 import { AuditHistory } from './components/AuditHistory';
+import { v7 as uuidv7 } from 'uuid';
 
 type ViewMode = 'timers' | 'audit';
 
@@ -16,6 +17,7 @@ function App() {
   const [negCode, setNegCode] = useState('');
   const [roundLabel, setRoundLabel] = useState('');
   const [timerStates, setTimerStates] = useState<{ [key: string]: number }>({});
+  const [sessionId, setSessionId] = useState(uuidv7());
 
   const handleTimerStart = (timerId: string) => {
     if (currentTimer) {
@@ -37,7 +39,8 @@ function App() {
       elapsedTime: event.elapsedTime,
       affCode,
       negCode,
-      roundLabel
+      roundLabel,
+      sessionId
     }]);
   };
 
@@ -45,21 +48,13 @@ function App() {
     setCurrentTimer(null);
     setEvents([]);
     setResetTrigger(prev => prev + 1);
+    setSessionId(uuidv7());
+    setRoundLabel('');
+    setAffCode('');
+    setNegCode('');
   };
 
-  const handleImport = (data: {
-    round: string;
-    teams: {
-      affirmative: string;
-      negative: string;
-    };
-    timers: {
-      id: string;
-      name: string;
-      currentTime: number;
-    }[];
-    auditLog: TimerEvent[];
-  }) => {
+  const handleImport = (data: DebateSession) => {
     // Stop any running timer
     setCurrentTimer(null);
     
@@ -68,6 +63,7 @@ function App() {
     setAffCode(data.teams.affirmative);
     setNegCode(data.teams.negative);
     setEvents(data.auditLog);
+    setSessionId(data.id);
     
     // Update timer states
     const newTimerStates: { [key: string]: number } = {};
@@ -222,6 +218,7 @@ function App() {
             roundLabel={roundLabel}
             affCode={affCode}
             negCode={negCode}
+            sessionId={sessionId}
             timers={[
               ...selectedFormat.affirmative.map(timer => ({
                 id: timer.id,

@@ -1,4 +1,4 @@
-import { TimerEvent } from '../types/debate';
+import { TimerEvent, DebateSession } from '../types/debate';
 import { format } from 'date-fns';
 
 interface AuditHistoryProps {
@@ -11,22 +11,11 @@ interface AuditHistoryProps {
     name: string;
     elapsedTime: number;
   }[];
-  onImport: (data: {
-    round: string;
-    teams: {
-      affirmative: string;
-      negative: string;
-    };
-    timers: {
-      id: string;
-      name: string;
-      currentTime: number;
-    }[];
-    auditLog: TimerEvent[];
-  }) => void;
+  sessionId: string;
+  onImport: (data: DebateSession) => void;
 }
 
-export function AuditHistory({ events, roundLabel, affCode, negCode, timers, onImport }: AuditHistoryProps) {
+export function AuditHistory({ events, roundLabel, affCode, negCode, timers, sessionId, onImport }: AuditHistoryProps) {
   const formatTimestamp = (timestamp: number) => {
     return format(new Date(timestamp), 'MMM d, yyyy HH:mm:ss.SSS');
   };
@@ -40,7 +29,8 @@ export function AuditHistory({ events, roundLabel, affCode, negCode, timers, onI
   };
 
   const handleExport = () => {
-    const exportData = {
+    const exportData: DebateSession = {
+      id: sessionId,
       round: roundLabel,
       teams: {
         affirmative: affCode,
@@ -51,20 +41,14 @@ export function AuditHistory({ events, roundLabel, affCode, negCode, timers, onI
         name: timer.name,
         currentTime: timer.elapsedTime
       })),
-      auditLog: events.map(event => ({
-        timestamp: event.timestamp,
-        type: event.type,
-        timerId: event.timerId,
-        side: event.side,
-        elapsedTime: event.elapsedTime
-      }))
+      auditLog: events
     };
 
     const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `debate-${roundLabel}-${new Date().toISOString().split('T')[0]}.json`;
+    a.download = `debate-${roundLabel}-${sessionId}.json`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
