@@ -6,7 +6,7 @@ import { AuditHistory } from './components/AuditHistory';
 import { RecentSessions, RecentSessionsRef } from './components/RecentSessions';
 import { v7 as uuidv7 } from 'uuid';
 
-type ViewMode = 'timers' | 'audit';
+type ViewMode = 'timers' | 'audit' | 'history';
 
 function App() {
   const [selectedFormat, setSelectedFormat] = useState<DebateFormat>(defaultFormats[0]);
@@ -139,6 +139,16 @@ function App() {
             >
               Audit
             </button>
+            <button
+              className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                viewMode === 'history'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+              onClick={() => setViewMode('history')}
+            >
+              History
+            </button>
           </nav>
         </div>
 
@@ -245,10 +255,6 @@ function App() {
         </div>
 
         <div className={`${viewMode === 'audit' ? 'block' : 'hidden'}`}>
-          <RecentSessions
-            ref={recentSessionsRef}
-            onImport={handleImport}
-          />
           <AuditHistory 
             events={events} 
             roundLabel={roundLabel}
@@ -267,6 +273,13 @@ function App() {
                 elapsedTime: timerStates[timer.id] || 0
               }))
             ]}
+            onImport={handleImport}
+          />
+        </div>
+
+        <div className={`${viewMode === 'history' ? 'block' : 'hidden'}`}>
+          <RecentSessions
+            ref={recentSessionsRef}
             onImport={handleImport}
           />
         </div>
