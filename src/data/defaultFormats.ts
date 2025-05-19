@@ -31,4 +31,18 @@ export const defaultFormats: DebateFormat[] = [
       { id: "neg-rebuttal2", name: "Second Negative Rebuttal", duration: 120, allowNegative: false },
     ],
   },
+  {
+    name: "Quick Test",
+    description: "Short timers for testing (30s each)",
+    affirmative: [
+      { id: "aff-test1", name: "Aff Test 1", duration: 30, allowNegative: true },
+      { id: "aff-test2", name: "Aff Test 2", duration: 30, allowNegative: true },
+      { id: "aff-test3", name: "Aff Test 3", duration: 30, allowNegative: true },
+    ],
+    negative: [
+      { id: "neg-test1", name: "Neg Test 1", duration: 30, allowNegative: true },
+      { id: "neg-test2", name: "Neg Test 2", duration: 30, allowNegative: true },
+      { id: "neg-test3", name: "Neg Test 3", duration: 30, allowNegative: true },
+    ],
+  },
 ]; 

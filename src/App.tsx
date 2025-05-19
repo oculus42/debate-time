@@ -13,6 +13,9 @@ function App() {
   const [viewMode, setViewMode] = useState<ViewMode>('timers');
 
   const handleTimerStart = (timerId: string) => {
+    if (currentTimer) {
+      handleTimerStop();
+    }
     setCurrentTimer(timerId);
   };
 
@@ -75,7 +78,7 @@ function App() {
           </div>
         </div>
 
-        {viewMode === 'timers' ? (
+        <div className={`${viewMode === 'timers' ? 'block' : 'hidden'}`}>
           <div className="grid grid-cols-2 gap-4">
             <div>
               <h2 className="text-xl font-bold mb-2">Affirmative</h2>
@@ -110,9 +113,11 @@ function App() {
               ))}
             </div>
           </div>
-        ) : (
+        </div>
+
+        <div className={`${viewMode === 'audit' ? 'block' : 'hidden'}`}>
           <AuditHistory events={events} />
-        )}
+        </div>
       </div>
     </div>
   );
