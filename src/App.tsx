@@ -132,7 +132,9 @@ function App() {
               </option>
             ))}
           </select>
+        </div>
 
+        <div className="mb-6 flex justify-between items-center">
           <div className="flex space-x-2">
             <button
               className="px-4 py-2 rounded-lg bg-green-500 text-white hover:bg-green-600"
