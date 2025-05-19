@@ -108,9 +108,14 @@ export function Timer({ id, name, duration, allowNegative, isActive, reset, init
 
   useEffect(() => {
     if (initialElapsedTime !== undefined) {
-      setState(prev => ({ ...prev, elapsedTime: initialElapsedTime }));
+      const remaining = duration * 1000 - initialElapsedTime;
+      setState(prev => ({ 
+        ...prev, 
+        elapsedTime: initialElapsedTime,
+        isOver: remaining <= 0 && !allowNegative
+      }));
     }
-  }, [initialElapsedTime]);
+  }, [initialElapsedTime, duration, allowNegative]);
 
   const formatTime = (ms: number) => {
     const totalSeconds = Math.floor(ms / 1000);

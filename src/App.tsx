@@ -117,6 +117,9 @@ function App() {
     });
     setTimerStates(newTimerStates);
 
+    // Switch to Timers tab
+    setViewMode('timers');
+
     // Trigger a reset to ensure timers update
     setResetTrigger(prev => prev + 1);
   };
