@@ -11,16 +11,21 @@ interface TimerProps {
   onStart: (id: string) => void;
   onStop: (id: string) => void;
   onUpdate: (id: string, elapsedTime: number) => void;
-  onAudit: (event: { type: 'start' | 'stop'; timestamp: number; elapsedTime: number }) => void;
+  onAudit: (event: { type: 'start' | 'stop' | 'over'; timestamp: number; elapsedTime: number }) => void;
 }
 
 interface TimerState {
   startTime: number | null;
   elapsedTime: number;
+  isOver: boolean;
 }
 
 export function Timer({ id, name, duration, allowNegative, isActive, reset, initialElapsedTime, onStart, onStop, onUpdate, onAudit }: TimerProps) {
-  const [state, setState] = useState<TimerState>({ startTime: null, elapsedTime: initialElapsedTime || 0 });
+  const [state, setState] = useState<TimerState>({ 
+    startTime: null, 
+    elapsedTime: initialElapsedTime || 0,
+    isOver: false
+  });
   const intervalRef = useRef<number>();
 
   const stopTimer = useCallback(() => {
@@ -30,7 +35,8 @@ export function Timer({ id, name, duration, allowNegative, isActive, reset, init
       const totalElapsed = state.elapsedTime + elapsed;
       setState(prev => ({
         startTime: null,
-        elapsedTime: totalElapsed
+        elapsedTime: totalElapsed,
+        isOver: prev.isOver
       }));
       onAudit({ type: 'stop', timestamp: now, elapsedTime: totalElapsed });
     }
@@ -44,7 +50,8 @@ export function Timer({ id, name, duration, allowNegative, isActive, reset, init
     const now = Date.now();
     setState(prev => ({
       startTime: now,
-      elapsedTime: prev.elapsedTime
+      elapsedTime: prev.elapsedTime,
+      isOver: false
     }));
     onAudit({ type: 'start', timestamp: now, elapsedTime: state.elapsedTime });
   }, [onAudit, state.elapsedTime]);
@@ -54,7 +61,7 @@ export function Timer({ id, name, duration, allowNegative, isActive, reset, init
       if (state.startTime) {
         stopTimer();
       }
-      setState({ startTime: null, elapsedTime: 0 });
+      setState({ startTime: null, elapsedTime: 0, isOver: false });
     }
   }, [reset]);
 
@@ -72,6 +79,17 @@ export function Timer({ id, name, duration, allowNegative, isActive, reset, init
         const now = Date.now();
         const elapsed = now - state.startTime!;
         const totalElapsed = state.elapsedTime + elapsed;
+        const remaining = duration * 1000 - totalElapsed;
+        
+        // Check if timer is over and hasn't been marked as over yet
+        if (remaining <= 0 && !allowNegative && !state.isOver) {
+          setState(prev => ({
+            ...prev,
+            isOver: true
+          }));
+          onAudit({ type: 'over', timestamp: now, elapsedTime: totalElapsed });
+        }
+
         setState(prev => ({
           ...prev,
           startTime: now,
@@ -86,7 +104,7 @@ export function Timer({ id, name, duration, allowNegative, isActive, reset, init
         clearInterval(intervalRef.current);
       }
     };
-  }, [state.startTime, id, onUpdate]);
+  }, [state.startTime, id, onUpdate, duration, allowNegative, state.isOver, onAudit]);
 
   useEffect(() => {
     if (initialElapsedTime !== undefined) {
@@ -104,18 +122,20 @@ export function Timer({ id, name, duration, allowNegative, isActive, reset, init
 
   const getDisplayTime = () => {
     const remaining = duration * 1000 - state.elapsedTime;
-    if (remaining < 0 && !allowNegative) {
-      return '0:00.00';
-    }
-    return formatTime(Math.abs(remaining));
+    const formattedTime = formatTime(Math.abs(remaining));
+    return remaining < 0 ? `-${formattedTime}` : formattedTime;
   };
 
   return (
     <button
       className={`p-4 m-2 rounded-lg w-full ${
-        isActive
-          ? 'bg-blue-500 text-white'
-          : 'bg-gray-200 hover:bg-gray-300'
+        state.isOver
+          ? isActive
+            ? 'bg-red-500 text-white'
+            : 'bg-orange-500 text-white'
+          : isActive
+            ? 'bg-blue-500 text-white'
+            : 'bg-gray-200 hover:bg-gray-300'
       }`}
       onClick={() => isActive ? onStop(id) : onStart(id)}
     >
