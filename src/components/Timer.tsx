@@ -9,6 +9,7 @@ interface TimerProps {
   reset: boolean;
   onStart: (id: string) => void;
   onStop: (id: string) => void;
+  onUpdate: (id: string, elapsedTime: number) => void;
   onAudit: (event: { type: 'start' | 'stop'; timestamp: number; elapsedTime: number }) => void;
 }
 
@@ -17,7 +18,7 @@ interface TimerState {
   elapsedTime: number;
 }
 
-export function Timer({ id, name, duration, allowNegative, isActive, reset, onStart, onStop, onAudit }: TimerProps) {
+export function Timer({ id, name, duration, allowNegative, isActive, reset, onStart, onStop, onUpdate, onAudit }: TimerProps) {
   const [state, setState] = useState<TimerState>({ startTime: null, elapsedTime: 0 });
   const intervalRef = useRef<number>();
 
@@ -69,11 +70,13 @@ export function Timer({ id, name, duration, allowNegative, isActive, reset, onSt
       intervalRef.current = window.setInterval(() => {
         const now = Date.now();
         const elapsed = now - state.startTime!;
+        const totalElapsed = state.elapsedTime + elapsed;
         setState(prev => ({
           ...prev,
           startTime: now,
-          elapsedTime: prev.elapsedTime + elapsed
+          elapsedTime: totalElapsed
         }));
+        onUpdate(id, totalElapsed);
       }, 10);
     }
 
@@ -82,7 +85,7 @@ export function Timer({ id, name, duration, allowNegative, isActive, reset, onSt
         clearInterval(intervalRef.current);
       }
     };
-  }, [state.startTime]);
+  }, [state.startTime, id, onUpdate]);
 
   const formatTime = (ms: number) => {
     const totalSeconds = Math.floor(ms / 1000);

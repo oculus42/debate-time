@@ -3,9 +3,17 @@ import { format } from 'date-fns';
 
 interface AuditHistoryProps {
   events: TimerEvent[];
+  roundLabel: string;
+  affCode: string;
+  negCode: string;
+  timers: {
+    id: string;
+    name: string;
+    elapsedTime: number;
+  }[];
 }
 
-export function AuditHistory({ events }: AuditHistoryProps) {
+export function AuditHistory({ events, roundLabel, affCode, negCode, timers }: AuditHistoryProps) {
   const formatTimestamp = (timestamp: number) => {
     return format(new Date(timestamp), 'MMM d, yyyy HH:mm:ss.SSS');
   };
@@ -18,9 +26,49 @@ export function AuditHistory({ events }: AuditHistoryProps) {
     return `${minutes}:${seconds.toString().padStart(2, '0')}.${milliseconds.toString().padStart(2, '0')}`;
   };
 
+  const handleExport = () => {
+    const exportData = {
+      round: roundLabel,
+      teams: {
+        affirmative: affCode,
+        negative: negCode
+      },
+      timers: timers.map(timer => ({
+        id: timer.id,
+        name: timer.name,
+        currentTime: timer.elapsedTime
+      })),
+      auditLog: events.map(event => ({
+        timestamp: event.timestamp,
+        type: event.type,
+        timerId: event.timerId,
+        side: event.side,
+        elapsedTime: event.elapsedTime
+      }))
+    };
+
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `debate-${roundLabel}-${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="bg-white rounded-lg shadow-lg p-4">
-      <h2 className="text-xl font-bold mb-4">Audit History</h2>
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-xl font-bold">Audit History</h2>
+        <button
+          onClick={handleExport}
+          className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+        >
+          Export JSON
+        </button>
+      </div>
       <div className="space-y-2">
         {events.map((event, index) => (
           <div

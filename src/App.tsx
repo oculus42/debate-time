@@ -15,6 +15,7 @@ function App() {
   const [affCode, setAffCode] = useState('');
   const [negCode, setNegCode] = useState('');
   const [roundLabel, setRoundLabel] = useState('');
+  const [timerStates, setTimerStates] = useState<{ [key: string]: number }>({});
 
   const handleTimerStart = (timerId: string) => {
     if (currentTimer) {
@@ -44,6 +45,13 @@ function App() {
     setCurrentTimer(null);
     setEvents([]);
     setResetTrigger(prev => prev + 1);
+  };
+
+  const handleTimerUpdate = (timerId: string, elapsedTime: number) => {
+    setTimerStates(prev => ({
+      ...prev,
+      [timerId]: elapsedTime
+    }));
   };
 
   return (
@@ -147,6 +155,7 @@ function App() {
                   reset={resetTrigger > 0}
                   onStart={handleTimerStart}
                   onStop={handleTimerStop}
+                  onUpdate={handleTimerUpdate}
                   onAudit={(event) => handleAudit(timer.id, event)}
                 />
               ))}
@@ -164,6 +173,7 @@ function App() {
                   reset={resetTrigger > 0}
                   onStart={handleTimerStart}
                   onStop={handleTimerStop}
+                  onUpdate={handleTimerUpdate}
                   onAudit={(event) => handleAudit(timer.id, event)}
                 />
               ))}
@@ -172,7 +182,24 @@ function App() {
         </div>
 
         <div className={`${viewMode === 'audit' ? 'block' : 'hidden'}`}>
-          <AuditHistory events={events} />
+          <AuditHistory 
+            events={events} 
+            roundLabel={roundLabel}
+            affCode={affCode}
+            negCode={negCode}
+            timers={[
+              ...selectedFormat.affirmative.map(timer => ({
+                id: timer.id,
+                name: timer.name,
+                elapsedTime: timerStates[timer.id] || 0
+              })),
+              ...selectedFormat.negative.map(timer => ({
+                id: timer.id,
+                name: timer.name,
+                elapsedTime: timerStates[timer.id] || 0
+              }))
+            ]}
+          />
         </div>
       </div>
     </div>
