@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { DebateFormat, TimerEvent, DebateSession } from './types/debate';
 import { defaultFormats } from './data/defaultFormats';
 import { Timer } from './components/Timer';
 import { AuditHistory } from './components/AuditHistory';
+import { RecentSessions, RecentSessionsRef } from './components/RecentSessions';
 import { v7 as uuidv7 } from 'uuid';
 
 type ViewMode = 'timers' | 'audit';
@@ -18,6 +19,7 @@ function App() {
   const [roundLabel, setRoundLabel] = useState('');
   const [timerStates, setTimerStates] = useState<{ [key: string]: number }>({});
   const [sessionId, setSessionId] = useState(uuidv7());
+  const recentSessionsRef = useRef<RecentSessionsRef>(null);
 
   const handleTimerStart = (timerId: string) => {
     if (currentTimer) {
@@ -45,6 +47,33 @@ function App() {
   };
 
   const handleNewTimer = () => {
+    // Save current session if there are any events
+    if (events.length > 0) {
+      const currentSession: DebateSession = {
+        id: sessionId,
+        round: roundLabel,
+        teams: {
+          affirmative: affCode,
+          negative: negCode
+        },
+        timers: [
+          ...selectedFormat.affirmative.map(timer => ({
+            id: timer.id,
+            name: timer.name,
+            currentTime: timerStates[timer.id] || 0
+          })),
+          ...selectedFormat.negative.map(timer => ({
+            id: timer.id,
+            name: timer.name,
+            currentTime: timerStates[timer.id] || 0
+          }))
+        ],
+        auditLog: events
+      };
+      recentSessionsRef.current?.addSession(currentSession);
+    }
+
+    // Reset everything
     setCurrentTimer(null);
     setEvents([]);
     setResetTrigger(prev => prev + 1);
@@ -213,6 +242,10 @@ function App() {
         </div>
 
         <div className={`${viewMode === 'audit' ? 'block' : 'hidden'}`}>
+          <RecentSessions
+            ref={recentSessionsRef}
+            onImport={handleImport}
+          />
           <AuditHistory 
             events={events} 
             roundLabel={roundLabel}
