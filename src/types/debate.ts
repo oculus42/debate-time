@@ -34,6 +34,7 @@ export interface DebateState {
 export interface DebateSession {
   id: string;
   round: string;
+  format: string;
   teams: {
     affirmative: string;
     negative: string;

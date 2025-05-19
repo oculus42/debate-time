@@ -67,6 +67,9 @@ export const RecentSessions = forwardRef<RecentSessionsRef, RecentSessionsProps>
                 <div className="text-sm text-gray-600">
                   {session.teams.affirmative} vs {session.teams.negative}
                 </div>
+                <div className="text-sm text-gray-600">
+                  Format: {session.format}
+                </div>
                 <div className="text-xs text-gray-500 mt-1">
                   {formatDate(session.auditLog[0]?.timestamp || Date.now())}
                 </div>

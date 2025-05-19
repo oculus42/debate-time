@@ -41,7 +41,7 @@ function App() {
     setCurrentTimer(null);
   };
 
-  const handleAudit = (timerId: string, event: { type: 'start' | 'stop'; timestamp: number; elapsedTime: number }) => {
+  const handleAudit = (timerId: string, event: { type: 'start' | 'stop' | 'over'; timestamp: number; elapsedTime: number }) => {
     setEvents(prev => [...prev, {
       timestamp: event.timestamp,
       type: event.type,
@@ -61,6 +61,7 @@ function App() {
       const currentSession: DebateSession = {
         id: sessionId,
         round: roundLabel,
+        format: selectedFormat.name,
         teams: {
           affirmative: affCode,
           negative: negCode
@@ -102,6 +103,12 @@ function App() {
     setNegCode(data.teams.negative);
     setEvents(data.auditLog);
     setSessionId(data.id);
+    
+    // Find and set the correct format
+    const format = availableFormats.find(f => f.name === data.format);
+    if (format) {
+      setSelectedFormat(format);
+    }
     
     // Update timer states
     const newTimerStates: { [key: string]: number } = {};
