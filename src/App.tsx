@@ -47,6 +47,39 @@ function App() {
     setResetTrigger(prev => prev + 1);
   };
 
+  const handleImport = (data: {
+    round: string;
+    teams: {
+      affirmative: string;
+      negative: string;
+    };
+    timers: {
+      id: string;
+      name: string;
+      currentTime: number;
+    }[];
+    auditLog: TimerEvent[];
+  }) => {
+    // Stop any running timer
+    setCurrentTimer(null);
+    
+    // Update basic info
+    setRoundLabel(data.round);
+    setAffCode(data.teams.affirmative);
+    setNegCode(data.teams.negative);
+    setEvents(data.auditLog);
+    
+    // Update timer states
+    const newTimerStates: { [key: string]: number } = {};
+    data.timers.forEach(timer => {
+      newTimerStates[timer.id] = timer.currentTime;
+    });
+    setTimerStates(newTimerStates);
+
+    // Trigger a reset to ensure timers update
+    setResetTrigger(prev => prev + 1);
+  };
+
   const handleTimerUpdate = (timerId: string, elapsedTime: number) => {
     setTimerStates(prev => ({
       ...prev,
@@ -153,6 +186,7 @@ function App() {
                   allowNegative={timer.allowNegative}
                   isActive={currentTimer === timer.id}
                   reset={resetTrigger > 0}
+                  initialElapsedTime={timerStates[timer.id]}
                   onStart={handleTimerStart}
                   onStop={handleTimerStop}
                   onUpdate={handleTimerUpdate}
@@ -171,6 +205,7 @@ function App() {
                   allowNegative={timer.allowNegative}
                   isActive={currentTimer === timer.id}
                   reset={resetTrigger > 0}
+                  initialElapsedTime={timerStates[timer.id]}
                   onStart={handleTimerStart}
                   onStop={handleTimerStop}
                   onUpdate={handleTimerUpdate}
@@ -199,6 +234,7 @@ function App() {
                 elapsedTime: timerStates[timer.id] || 0
               }))
             ]}
+            onImport={handleImport}
           />
         </div>
       </div>

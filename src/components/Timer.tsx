@@ -7,6 +7,7 @@ interface TimerProps {
   allowNegative: boolean;
   isActive: boolean;
   reset: boolean;
+  initialElapsedTime?: number;
   onStart: (id: string) => void;
   onStop: (id: string) => void;
   onUpdate: (id: string, elapsedTime: number) => void;
@@ -18,8 +19,8 @@ interface TimerState {
   elapsedTime: number;
 }
 
-export function Timer({ id, name, duration, allowNegative, isActive, reset, onStart, onStop, onUpdate, onAudit }: TimerProps) {
-  const [state, setState] = useState<TimerState>({ startTime: null, elapsedTime: 0 });
+export function Timer({ id, name, duration, allowNegative, isActive, reset, initialElapsedTime, onStart, onStop, onUpdate, onAudit }: TimerProps) {
+  const [state, setState] = useState<TimerState>({ startTime: null, elapsedTime: initialElapsedTime || 0 });
   const intervalRef = useRef<number>();
 
   const stopTimer = useCallback(() => {
@@ -86,6 +87,12 @@ export function Timer({ id, name, duration, allowNegative, isActive, reset, onSt
       }
     };
   }, [state.startTime, id, onUpdate]);
+
+  useEffect(() => {
+    if (initialElapsedTime !== undefined) {
+      setState(prev => ({ ...prev, elapsedTime: initialElapsedTime }));
+    }
+  }, [initialElapsedTime]);
 
   const formatTime = (ms: number) => {
     const totalSeconds = Math.floor(ms / 1000);

@@ -11,9 +11,22 @@ interface AuditHistoryProps {
     name: string;
     elapsedTime: number;
   }[];
+  onImport: (data: {
+    round: string;
+    teams: {
+      affirmative: string;
+      negative: string;
+    };
+    timers: {
+      id: string;
+      name: string;
+      currentTime: number;
+    }[];
+    auditLog: TimerEvent[];
+  }) => void;
 }
 
-export function AuditHistory({ events, roundLabel, affCode, negCode, timers }: AuditHistoryProps) {
+export function AuditHistory({ events, roundLabel, affCode, negCode, timers, onImport }: AuditHistoryProps) {
   const formatTimestamp = (timestamp: number) => {
     return format(new Date(timestamp), 'MMM d, yyyy HH:mm:ss.SSS');
   };
@@ -58,16 +71,44 @@ export function AuditHistory({ events, roundLabel, affCode, negCode, timers }: A
     URL.revokeObjectURL(url);
   };
 
+  const handleImport = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const data = JSON.parse(e.target?.result as string);
+        onImport(data);
+      } catch (error) {
+        console.error('Error parsing JSON file:', error);
+        alert('Error loading file. Please make sure it\'s a valid debate export file.');
+      }
+    };
+    reader.readAsText(file);
+  };
+
   return (
     <div className="bg-white rounded-lg shadow-lg p-4">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-bold">Audit History</h2>
-        <button
-          onClick={handleExport}
-          className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
-        >
-          Export JSON
-        </button>
+        <div className="flex space-x-2">
+          <label className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 cursor-pointer">
+            Import JSON
+            <input
+              type="file"
+              accept=".json"
+              onChange={handleImport}
+              className="hidden"
+            />
+          </label>
+          <button
+            onClick={handleExport}
+            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+          >
+            Export JSON
+          </button>
+        </div>
       </div>
       <div className="space-y-2">
         {events.map((event, index) => (
