@@ -117,90 +117,91 @@ function App() {
       <div className="max-w-md mx-auto">
         <h1 className="text-3xl font-bold text-center mb-6">Debate Time</h1>
         
-        <div className="mb-6 flex justify-between items-center">
-          <select
-            className="p-2 rounded-lg border border-gray-300"
-            value={selectedFormat.name}
-            onChange={(e) => {
-              const format = defaultFormats.find(f => f.name === e.target.value);
-              if (format) setSelectedFormat(format);
-            }}
-          >
-            {defaultFormats.map(format => (
-              <option key={format.name} value={format.name}>
-                {format.name}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div className="mb-6 flex justify-between items-center">
-          <div className="flex space-x-2">
+        <div className="border-b border-gray-200 mb-4">
+          <nav className="-mb-px flex space-x-8">
             <button
-              className="px-4 py-2 rounded-lg bg-green-500 text-white hover:bg-green-600"
-              onClick={handleNewTimer}
-            >
-              New Timer
-            </button>
-            <button
-              className={`px-4 py-2 rounded-lg ${
+              className={`py-4 px-1 border-b-2 font-medium text-sm ${
                 viewMode === 'timers'
-                  ? 'bg-blue-500 text-white'
-                  : 'bg-gray-200 hover:bg-gray-300'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
               }`}
               onClick={() => setViewMode('timers')}
             >
               Timers
             </button>
             <button
-              className={`px-4 py-2 rounded-lg ${
+              className={`py-4 px-1 border-b-2 font-medium text-sm ${
                 viewMode === 'audit'
-                  ? 'bg-blue-500 text-white'
-                  : 'bg-gray-200 hover:bg-gray-300'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
               }`}
               onClick={() => setViewMode('audit')}
             >
               Audit
             </button>
-          </div>
-        </div>
-
-        <div className="mb-6 space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Round</label>
-            <input
-              type="text"
-              value={roundLabel}
-              onChange={(e) => setRoundLabel(e.target.value)}
-              placeholder="Round Label (e.g., 'Round 1', 'Finals')"
-              className="w-full p-2 rounded-lg border border-gray-300"
-            />
-          </div>
-          <div className="flex gap-4">
-            <div className="flex-1">
-              <label className="block text-sm font-medium text-gray-700 mb-1">Affirmative</label>
-              <input
-                type="text"
-                value={affCode}
-                onChange={(e) => setAffCode(e.target.value)}
-                placeholder="Team Code"
-                className="w-full p-2 rounded-lg border border-gray-300"
-              />
-            </div>
-            <div className="flex-1">
-              <label className="block text-sm font-medium text-gray-700 mb-1">Negative</label>
-              <input
-                type="text"
-                value={negCode}
-                onChange={(e) => setNegCode(e.target.value)}
-                placeholder="Team Code"
-                className="w-full p-2 rounded-lg border border-gray-300"
-              />
-            </div>
-          </div>
+          </nav>
         </div>
 
         <div className={`${viewMode === 'timers' ? 'block' : 'hidden'}`}>
+          <div className="mb-6 flex justify-between items-center">
+            <select
+              className="p-2 rounded-lg border border-gray-300"
+              value={selectedFormat.name}
+              onChange={(e) => {
+                const format = defaultFormats.find(f => f.name === e.target.value);
+                if (format) setSelectedFormat(format);
+              }}
+            >
+              {defaultFormats.map(format => (
+                <option key={format.name} value={format.name}>
+                  {format.name}
+                </option>
+              ))}
+            </select>
+
+            <button
+              className="px-4 py-2 rounded-lg bg-green-500 text-white hover:bg-green-600"
+              onClick={handleNewTimer}
+            >
+              New Timer
+            </button>
+          </div>
+
+          <div className="mb-6 space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Round</label>
+              <input
+                type="text"
+                value={roundLabel}
+                onChange={(e) => setRoundLabel(e.target.value)}
+                placeholder="Round Label (e.g., 'Round 1', 'Finals')"
+                className="w-full p-2 rounded-lg border border-gray-300"
+              />
+            </div>
+            <div className="flex gap-4">
+              <div className="flex-1">
+                <label className="block text-sm font-medium text-gray-700 mb-1">Affirmative</label>
+                <input
+                  type="text"
+                  value={affCode}
+                  onChange={(e) => setAffCode(e.target.value)}
+                  placeholder="Team Code"
+                  className="w-full p-2 rounded-lg border border-gray-300"
+                />
+              </div>
+              <div className="flex-1">
+                <label className="block text-sm font-medium text-gray-700 mb-1">Negative</label>
+                <input
+                  type="text"
+                  value={negCode}
+                  onChange={(e) => setNegCode(e.target.value)}
+                  placeholder="Team Code"
+                  className="w-full p-2 rounded-lg border border-gray-300"
+                />
+              </div>
+            </div>
+          </div>
+
           <div className="grid grid-cols-2 gap-4">
             <div>
               <h2 className="text-xl font-bold mb-2">Affirmative</h2>
