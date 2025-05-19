@@ -1,8 +1,9 @@
 export interface TimerEvent {
   timestamp: number;
-  type: 'start' | 'stop' | 'reset';
+  type: 'start' | 'stop';
   timerId: string;
   side: 'affirmative' | 'negative';
+  elapsedTime: number;
 }
 
 export interface Timer {

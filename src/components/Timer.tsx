@@ -8,7 +8,7 @@ interface TimerProps {
   isActive: boolean;
   onStart: (id: string) => void;
   onStop: (id: string) => void;
-  onAudit: (event: { type: 'start' | 'stop'; timestamp: number }) => void;
+  onAudit: (event: { type: 'start' | 'stop'; timestamp: number; elapsedTime: number }) => void;
 }
 
 interface TimerState {
@@ -24,17 +24,18 @@ export function Timer({ id, name, duration, allowNegative, isActive, onStart, on
     if (state.startTime) {
       const now = Date.now();
       const elapsed = now - state.startTime;
+      const totalElapsed = state.elapsedTime + elapsed;
       setState(prev => ({
         startTime: null,
-        elapsedTime: prev.elapsedTime + elapsed
+        elapsedTime: totalElapsed
       }));
-      onAudit({ type: 'stop', timestamp: now });
+      onAudit({ type: 'stop', timestamp: now, elapsedTime: totalElapsed });
     }
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
       intervalRef.current = undefined;
     }
-  }, [state.startTime, onAudit]);
+  }, [state.startTime, state.elapsedTime, onAudit]);
 
   const startTimer = useCallback(() => {
     const now = Date.now();
@@ -42,8 +43,8 @@ export function Timer({ id, name, duration, allowNegative, isActive, onStart, on
       startTime: now,
       elapsedTime: prev.elapsedTime
     }));
-    onAudit({ type: 'start', timestamp: now });
-  }, [onAudit]);
+    onAudit({ type: 'start', timestamp: now, elapsedTime: state.elapsedTime });
+  }, [onAudit, state.elapsedTime]);
 
   useEffect(() => {
     if (isActive && !state.startTime) {
