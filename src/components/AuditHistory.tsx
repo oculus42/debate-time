@@ -113,14 +113,14 @@ export function AuditHistory({ events, roundLabel, affCode, negCode, timers, ses
                   {formatElapsedTime(event.elapsedTime)}
                 </span>
               </div>
-              <span className="text-sm text-gray-500 font-mono">
-                {formatTimestamp(event.timestamp)}
-              </span>
             </div>
             <div className="text-sm text-gray-600">
               {event.roundLabel && <span className="mr-4">Round: {event.roundLabel}</span>}
               {event.affCode && <span className="mr-4">Aff: {event.affCode}</span>}
               {event.negCode && <span>Neg: {event.negCode}</span>}
+            </div>
+            <div className="text-sm text-gray-600">
+              {formatTimestamp(event.timestamp)}
             </div>
           </div>
         ))}
