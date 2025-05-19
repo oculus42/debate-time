@@ -1,15 +1,24 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { DebateFormat, TimerEvent, DebateSession } from './types/debate';
 import { defaultFormats } from './data/defaultFormats';
 import { Timer } from './components/Timer';
 import { AuditHistory } from './components/AuditHistory';
 import { RecentSessions, RecentSessionsRef } from './components/RecentSessions';
+import { FormatSettings } from './components/FormatSettings';
 import { v7 as uuidv7 } from 'uuid';
 
-type ViewMode = 'timers' | 'audit' | 'history';
+type ViewMode = 'timers' | 'audit' | 'history' | 'settings';
 
 function App() {
-  const [selectedFormat, setSelectedFormat] = useState<DebateFormat>(defaultFormats[0]);
+  const [selectedFormat, setSelectedFormat] = useState<DebateFormat>(() => {
+    const storedDefault = localStorage.getItem('debateTimerDefaultFormat');
+    if (storedDefault) {
+      const defaultFormat = defaultFormats.find(f => f.name === storedDefault);
+      if (defaultFormat) return defaultFormat;
+    }
+    return defaultFormats[0];
+  });
+  const [availableFormats, setAvailableFormats] = useState<DebateFormat[]>(defaultFormats);
   const [currentTimer, setCurrentTimer] = useState<string | null>(null);
   const [events, setEvents] = useState<TimerEvent[]>([]);
   const [viewMode, setViewMode] = useState<ViewMode>('timers');
@@ -149,6 +158,16 @@ function App() {
             >
               History
             </button>
+            <button
+              className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                viewMode === 'settings'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+              onClick={() => setViewMode('settings')}
+            >
+              Settings
+            </button>
           </nav>
         </div>
 
@@ -158,11 +177,11 @@ function App() {
               className="p-2 rounded-lg border border-gray-300"
               value={selectedFormat.name}
               onChange={(e) => {
-                const format = defaultFormats.find(f => f.name === e.target.value);
+                const format = availableFormats.find(f => f.name === e.target.value);
                 if (format) setSelectedFormat(format);
               }}
             >
-              {defaultFormats.map(format => (
+              {availableFormats.map(format => (
                 <option key={format.name} value={format.name}>
                   {format.name}
                 </option>
@@ -281,6 +300,15 @@ function App() {
           <RecentSessions
             ref={recentSessionsRef}
             onImport={handleImport}
+          />
+        </div>
+
+        <div className={`${viewMode === 'settings' ? 'block' : 'hidden'}`}>
+          <FormatSettings
+            formats={defaultFormats}
+            defaultFormat={selectedFormat}
+            onFormatsChange={setAvailableFormats}
+            onDefaultFormatChange={setSelectedFormat}
           />
         </div>
       </div>
