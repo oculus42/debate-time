@@ -75,11 +75,14 @@ export function Timer({ id, name, duration, allowNegative, isActive, onStart, on
   }, [state.startTime]);
 
   const formatTime = (ms: number) => {
-    const totalSeconds = Math.floor(ms / 1000);
+    const isNegative = ms < 0;
+    const absMs = Math.abs(ms);
+    const totalSeconds = Math.floor(absMs / 1000);
     const minutes = Math.floor(totalSeconds / 60);
     const seconds = totalSeconds % 60;
-    const milliseconds = Math.floor((ms % 1000) / 10);
-    return `${minutes}:${seconds.toString().padStart(2, '0')}.${milliseconds.toString().padStart(2, '0')}`;
+    const milliseconds = Math.floor((absMs % 1000) / 10);
+    const timeStr = `${minutes}:${seconds.toString().padStart(2, '0')}.${milliseconds.toString().padStart(2, '0')}`;
+    return isNegative ? `-${timeStr}` : timeStr;
   };
 
   const getDisplayTime = () => {
@@ -87,7 +90,7 @@ export function Timer({ id, name, duration, allowNegative, isActive, onStart, on
     if (remaining < 0 && !allowNegative) {
       return '0:00.00';
     }
-    return formatTime(Math.abs(remaining));
+    return formatTime(remaining);
   };
 
   return (
