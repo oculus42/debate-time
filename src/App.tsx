@@ -11,6 +11,7 @@ function App() {
   const [currentTimer, setCurrentTimer] = useState<string | null>(null);
   const [events, setEvents] = useState<TimerEvent[]>([]);
   const [viewMode, setViewMode] = useState<ViewMode>('timers');
+  const [resetTrigger, setResetTrigger] = useState(0);
 
   const handleTimerStart = (timerId: string) => {
     if (currentTimer) {
@@ -31,6 +32,12 @@ function App() {
       side: timerId.startsWith('aff') ? 'affirmative' : 'negative',
       elapsedTime: event.elapsedTime
     }]);
+  };
+
+  const handleNewTimer = () => {
+    setCurrentTimer(null);
+    setEvents([]);
+    setResetTrigger(prev => prev + 1);
   };
 
   return (
@@ -55,6 +62,12 @@ function App() {
           </select>
 
           <div className="flex space-x-2">
+            <button
+              className="px-4 py-2 rounded-lg bg-green-500 text-white hover:bg-green-600"
+              onClick={handleNewTimer}
+            >
+              New Timer
+            </button>
             <button
               className={`px-4 py-2 rounded-lg ${
                 viewMode === 'timers'
@@ -90,6 +103,7 @@ function App() {
                   duration={timer.duration}
                   allowNegative={timer.allowNegative}
                   isActive={currentTimer === timer.id}
+                  reset={resetTrigger > 0}
                   onStart={handleTimerStart}
                   onStop={handleTimerStop}
                   onAudit={(event) => handleAudit(timer.id, event)}
@@ -106,6 +120,7 @@ function App() {
                   duration={timer.duration}
                   allowNegative={timer.allowNegative}
                   isActive={currentTimer === timer.id}
+                  reset={resetTrigger > 0}
                   onStart={handleTimerStart}
                   onStop={handleTimerStop}
                   onAudit={(event) => handleAudit(timer.id, event)}

@@ -6,6 +6,7 @@ interface TimerProps {
   duration: number;
   allowNegative: boolean;
   isActive: boolean;
+  reset: boolean;
   onStart: (id: string) => void;
   onStop: (id: string) => void;
   onAudit: (event: { type: 'start' | 'stop'; timestamp: number; elapsedTime: number }) => void;
@@ -16,7 +17,7 @@ interface TimerState {
   elapsedTime: number;
 }
 
-export function Timer({ id, name, duration, allowNegative, isActive, onStart, onStop, onAudit }: TimerProps) {
+export function Timer({ id, name, duration, allowNegative, isActive, reset, onStart, onStop, onAudit }: TimerProps) {
   const [state, setState] = useState<TimerState>({ startTime: null, elapsedTime: 0 });
   const intervalRef = useRef<number>();
 
@@ -47,6 +48,15 @@ export function Timer({ id, name, duration, allowNegative, isActive, onStart, on
   }, [onAudit, state.elapsedTime]);
 
   useEffect(() => {
+    if (reset) {
+      if (state.startTime) {
+        stopTimer();
+      }
+      setState({ startTime: null, elapsedTime: 0 });
+    }
+  }, [reset]);
+
+  useEffect(() => {
     if (isActive && !state.startTime) {
       startTimer();
     } else if (!isActive && state.startTime) {
@@ -75,14 +85,11 @@ export function Timer({ id, name, duration, allowNegative, isActive, onStart, on
   }, [state.startTime]);
 
   const formatTime = (ms: number) => {
-    const isNegative = ms < 0;
-    const absMs = Math.abs(ms);
-    const totalSeconds = Math.floor(absMs / 1000);
+    const totalSeconds = Math.floor(ms / 1000);
     const minutes = Math.floor(totalSeconds / 60);
     const seconds = totalSeconds % 60;
-    const milliseconds = Math.floor((absMs % 1000) / 10);
-    const timeStr = `${minutes}:${seconds.toString().padStart(2, '0')}.${milliseconds.toString().padStart(2, '0')}`;
-    return isNegative ? `-${timeStr}` : timeStr;
+    const milliseconds = Math.floor((ms % 1000) / 10);
+    return `${minutes}:${seconds.toString().padStart(2, '0')}.${milliseconds.toString().padStart(2, '0')}`;
   };
 
   const getDisplayTime = () => {
@@ -90,7 +97,7 @@ export function Timer({ id, name, duration, allowNegative, isActive, onStart, on
     if (remaining < 0 && !allowNegative) {
       return '0:00.00';
     }
-    return formatTime(remaining);
+    return formatTime(Math.abs(remaining));
   };
 
   return (
