@@ -28,9 +28,15 @@ function App() {
   const [roundLabel, setRoundLabel] = useState('');
   const [timerStates, setTimerStates] = useState<{ [key: string]: number }>({});
   const [sessionId, setSessionId] = useState(uuidv7());
+  const [isHistorical, setIsHistorical] = useState(false);
   const recentSessionsRef = useRef<RecentSessionsRef>(null);
 
   const handleTimerStart = (timerId: string) => {
+    if (isHistorical) {
+      // Generate new session ID and clear historical flag when starting a timer
+      setSessionId(uuidv7());
+      setIsHistorical(false);
+    }
     if (currentTimer) {
       handleTimerStop();
     }
@@ -56,8 +62,8 @@ function App() {
   };
 
   const handleNewTimer = () => {
-    // Save current session if there are any events
-    if (events.length > 0) {
+    // Only save current session if there are any events and it's not historical
+    if (events.length > 0 && !isHistorical) {
       const currentSession: DebateSession = {
         id: sessionId,
         round: roundLabel,
@@ -78,7 +84,8 @@ function App() {
             currentTime: timerStates[timer.id] || 0
           }))
         ],
-        auditLog: events
+        auditLog: events,
+        isHistorical: false
       };
       recentSessionsRef.current?.addSession(currentSession);
     }
@@ -91,6 +98,7 @@ function App() {
     setRoundLabel('');
     setAffCode('');
     setNegCode('');
+    setIsHistorical(false);
   };
 
   const handleImport = (data: DebateSession) => {
@@ -103,6 +111,7 @@ function App() {
     setNegCode(data.teams.negative);
     setEvents(data.auditLog);
     setSessionId(data.id);
+    setIsHistorical(true);
     
     // Find and set the correct format
     const format = availableFormats.find(f => f.name === data.format);

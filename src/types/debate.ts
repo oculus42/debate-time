@@ -45,4 +45,5 @@ export interface DebateSession {
     currentTime: number;
   }[];
   auditLog: TimerEvent[];
+  isHistorical: boolean;
 } 
