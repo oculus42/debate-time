@@ -133,7 +133,7 @@ export function Timer({ id, name, duration, allowNegative, isActive, reset, init
 
   return (
     <button
-      className={`p-4 m-2 rounded-lg w-full ${
+      className={`p-4 my-2 rounded-lg w-full ${
         state.isOver
           ? isActive
             ? 'bg-red-500 text-white'

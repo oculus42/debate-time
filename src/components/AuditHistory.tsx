@@ -77,7 +77,7 @@ export function AuditHistory({ events, roundLabel, affCode, negCode, timers, ses
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-bold">Audit History</h2>
         <div className="flex space-x-2">
-          <label className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 cursor-pointer">
+          <label className="px-4 py-2 text-center bg-gray-500 text-white rounded-lg hover:bg-gray-600 cursor-pointer">
             Import JSON
             <input
               type="file"

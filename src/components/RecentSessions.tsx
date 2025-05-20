@@ -34,6 +34,14 @@ export const RecentSessions = forwardRef<RecentSessionsRef, RecentSessionsProps>
     localStorage.removeItem(STORAGE_KEY);
   };
 
+  const deleteSession = (sessionId: string) => {
+    setSessions(prev => {
+      const newSessions = prev.filter(session => session.id !== sessionId);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(newSessions));
+      return newSessions;
+    });
+  };
+
   const formatDate = (timestamp: number) => {
     return format(new Date(timestamp), 'MMM d, yyyy HH:mm:ss');
   };
@@ -74,12 +82,20 @@ export const RecentSessions = forwardRef<RecentSessionsRef, RecentSessionsProps>
                   {formatDate(session.auditLog[0]?.timestamp || Date.now())}
                 </div>
               </div>
-              <button
-                onClick={() => onImport(session)}
-                className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
-              >
-                Load
-              </button>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => onImport(session)}
+                  className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
+                >
+                  Load
+                </button>
+                <button
+                  onClick={() => deleteSession(session.id)}
+                  className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
+                >
+                  Delete
+                </button>
+              </div>
             </div>
           ))
         )}
