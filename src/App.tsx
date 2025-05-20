@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import { DebateFormat, TimerEvent, DebateSession } from './types/debate';
 import { defaultFormats } from './data/defaultFormats';
 import { Timer } from './components/Timer';
@@ -104,7 +104,7 @@ function App() {
   const handleImport = (data: DebateSession) => {
     // Stop any running timer
     setCurrentTimer(null);
-    
+
     // Update basic info
     setRoundLabel(data.round);
     setAffCode(data.teams.affirmative);
@@ -112,13 +112,13 @@ function App() {
     setEvents(data.auditLog);
     setSessionId(data.id);
     setIsHistorical(true);
-    
+
     // Find and set the correct format
     const format = availableFormats.find(f => f.name === data.format);
     if (format) {
       setSelectedFormat(format);
     }
-    
+
     // Update timer states
     const newTimerStates: { [key: string]: number } = {};
     data.timers.forEach(timer => {
@@ -144,7 +144,7 @@ function App() {
     <div className="min-h-screen bg-gray-100 p-4">
       <div className="max-w-md mx-auto">
         <h1 className="text-3xl font-bold text-center mb-6">Debate Time</h1>
-        
+
         <div className="border-b border-gray-200 mb-4">
           <nav className="-mb-px flex space-x-8">
             <button
@@ -293,8 +293,9 @@ function App() {
         </div>
 
         <div className={`${viewMode === 'audit' ? 'block' : 'hidden'}`}>
-          <AuditHistory 
-            events={events} 
+          <AuditHistory
+            events={events}
+            format={selectedFormat.name}
             roundLabel={roundLabel}
             affCode={affCode}
             negCode={negCode}
@@ -335,4 +336,4 @@ function App() {
   );
 }
 
-export default App; 
+export default App;

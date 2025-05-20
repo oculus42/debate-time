@@ -3,6 +3,7 @@ import { format } from 'date-fns';
 
 interface AuditHistoryProps {
   events: TimerEvent[];
+  format: string;
   roundLabel: string;
   affCode: string;
   negCode: string;
@@ -15,7 +16,7 @@ interface AuditHistoryProps {
   onImport: (data: DebateSession) => void;
 }
 
-export function AuditHistory({ events, roundLabel, affCode, negCode, timers, sessionId, onImport }: AuditHistoryProps) {
+export function AuditHistory({ events, format: formatName, roundLabel, affCode, negCode, timers, sessionId, onImport }: AuditHistoryProps) {
   const formatTimestamp = (timestamp: number) => {
     return format(new Date(timestamp), 'MMM d, yyyy HH:mm:ss.SSS');
   };
@@ -31,6 +32,7 @@ export function AuditHistory({ events, roundLabel, affCode, negCode, timers, ses
   const handleExport = () => {
     const exportData: DebateSession = {
       id: sessionId,
+      format: formatName,
       round: roundLabel,
       teams: {
         affirmative: affCode,
@@ -41,7 +43,8 @@ export function AuditHistory({ events, roundLabel, affCode, negCode, timers, ses
         name: timer.name,
         currentTime: timer.elapsedTime
       })),
-      auditLog: events
+      auditLog: events,
+      isHistorical: true,
     };
 
     const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
@@ -132,4 +135,4 @@ export function AuditHistory({ events, roundLabel, affCode, negCode, timers, ses
       </div>
     </div>
   );
-} 
+}

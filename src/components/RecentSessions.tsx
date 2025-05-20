@@ -79,7 +79,8 @@ export const RecentSessions = forwardRef<RecentSessionsRef, RecentSessionsProps>
                   Format: {session.format}
                 </div>
                 <div className="text-xs text-gray-500 mt-1">
-                  {formatDate(session.auditLog[0]?.timestamp || Date.now())}
+                  {formatDate(session.auditLog[0]?.timestamp || Date.now())}<br/>
+                  {formatDate(session.auditLog[session.auditLog.length - 1]?.timestamp || Date.now())}
                 </div>
               </div>
               <div className="flex gap-2">
@@ -102,4 +103,4 @@ export const RecentSessions = forwardRef<RecentSessionsRef, RecentSessionsProps>
       </div>
     </div>
   );
-}); 
+});
